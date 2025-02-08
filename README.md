@@ -21,7 +21,7 @@ Transform AI-generated text into **formal, human-like, and academic writing** wi
 ## 🚀 Live   
 🔗 **[Try the AI Text Humanizer App on Streamlit](https://ai-text-humanizer-app-by-dada.streamlit.app/)** *
 
-![AI-Text-Humanizer-App](https://github.com/DadaNanjesha/AI-Text-Humanizer-App/media/AITOHUMAN.png)
+![AI-Text-Humanizer-App](media/AITOHUMAN.png)
 
 ---
 
