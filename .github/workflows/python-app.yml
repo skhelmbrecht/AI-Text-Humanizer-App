@@ -4,59 +4,39 @@ on:
   push:
     branches: [ "dev", "main" ]
   pull_request:
-    branches: [ "dev", "main" ]
+    branches: [ "dev" ]
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Check out the repository
-      - uses: actions/checkout@v4
+      # 1. Check out your code
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      # 2. Cache pip dependencies
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      
-      # 3. Set up Python
+      # 2. Set up Python (this is where Python comes from!)
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
 
-      # 4. Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          
-          # Install main dev/test tools
-          pip install flake8 pytest
-          
-          # Install known top-level libs
-          pip install spacy sentence-transformers nltk
-          
-          # If a requirements.txt file exists, install from it
-          if [ -f requirements.txt ]; then 
-            pip install -r requirements.txt
-          fi
-          
-          # Download spacy + nltk data (or only specific models)
-          python -m spacy download en_core_web_sm
-          python -m nltk.downloader all
+      # 3. Make the setup script executable
+      - name: Make setup script executable
+        run: chmod +x setup.sh
 
-      # 5. Lint with flake8
-      - name: Lint with flake8
+      # 4. Run setup.sh (installs dependencies, spacy model, nltk data, etc.)
+      - name: Run setup script
+        run: ./setup.sh
+
+      # 5. (Optional) Lint and test
+      - name: Lint & Test
         run: |
-          # stop the build if there are Python syntax errors or undefined names
+          pip install flake8 pytest
+          # Lint
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings (so the workflow doesn't fail)
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      
+
