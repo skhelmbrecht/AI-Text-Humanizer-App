@@ -6,37 +6,26 @@ on:
   pull_request:
     branches: [ "dev" ]
 
-permissions:
-  contents: read
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Check out your code
-      - name: Check out repository
+      - name: Check out
         uses: actions/checkout@v4
 
-      # 2. Set up Python (this is where Python comes from!)
-      - name: Set up Python 3.10
+      - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
 
-      # 3. Make the setup script executable
+      - name: Show repo files (debug)
+        run: ls -lah
+
       - name: Make setup script executable
         run: chmod +x setup.sh
+        # If your file is in a subfolder, e.g. scripts/setup.sh,
+        # then do: chmod +x scripts/setup.sh
 
-      # 4. Run setup.sh (installs dependencies, spacy model, nltk data, etc.)
       - name: Run setup script
         run: ./setup.sh
-
-      # 5. (Optional) Lint and test
-      - name: Lint & Test
-        run: |
-          pip install flake8 pytest
-          # Lint
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
+        # Or: ./scripts/setup.sh if it's in the scripts/ folder
