@@ -84,7 +84,7 @@ def main():
         else:
             with st.spinner("Transforming text..."):
                 # Input stats
-                input_word_count = len(word_tokenize(user_text))
+                input_word_count = len(word_tokenize(user_text,language='english', preserve_line=True))
                 doc_input = NLP_GLOBAL(user_text)
                 input_sentence_count = len(list(doc_input.sents))
 
@@ -105,7 +105,7 @@ def main():
                 st.write(transformed)
 
                 # Output stats
-                output_word_count = len(word_tokenize(transformed))
+                output_word_count = len(word_tokenize(transformed,language='english', preserve_line=True))
                 doc_output = NLP_GLOBAL(transformed)
                 output_sentence_count = len(list(doc_output.sents))
 
