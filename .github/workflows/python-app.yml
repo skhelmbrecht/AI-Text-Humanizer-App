@@ -29,7 +29,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           # If you use a requirements.txt for the main libs:
-          # if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
           # Or explicitly install certain libraries if not in requirements.txt
           pip install streamlit spacy nltk sentence-transformers
