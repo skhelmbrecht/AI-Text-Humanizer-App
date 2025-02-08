@@ -24,7 +24,7 @@ def download_nltk_resources():
     else:
         ssl._create_default_https_context = _create_unverified_https_context
 
-    resources = ['punkt', 'averaged_perceptron_tagger', 'wordnet']
+    resources = ['punkt', 'averaged_perceptron_tagger', 'punkt_tab','wordnet']
     for resource in resources:
         try:
             nltk.download(resource, quiet=True)
