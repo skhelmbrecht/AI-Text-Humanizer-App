@@ -1,8 +1,7 @@
 import streamlit as st
-import ssl
 from transformer.app import AcademicTextHumanizer, NLP_GLOBAL, download_nltk_resources
 from nltk.tokenize import word_tokenize
-import nltk
+
 
 
 def main():
