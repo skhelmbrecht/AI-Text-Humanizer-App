@@ -3,7 +3,7 @@
 echo "Installing pip dependencies..."
 pip install --upgrade pip
 # pip install -r requirements.txt
-pip install spacy sentence-transformers nltk
+pip install streamlit spacy sentence-transformers nltk
 
 echo "Installing spaCy model..."
 python -m spacy download en_core_web_sm
