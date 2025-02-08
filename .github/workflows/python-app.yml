@@ -4,28 +4,57 @@ on:
   push:
     branches: [ "dev", "main" ]
   pull_request:
-    branches: [ "dev","main" ]
+    branches: [ "dev" ]
+
+permissions:
+  contents: read
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check out
+      # 1. Check out the repository
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      # 2. Set up Python
+      - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
 
-      - name: Show repo files (debug)
-        run: ls -lah
+      # 3. Upgrade pip & install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # If you use a requirements.txt for the main libs:
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Make setup script executable
-        run: chmod +x setup.sh
-        # If your file is in a subfolder, e.g. scripts/setup.sh,
-        # then do: chmod +x scripts/setup.sh
+          # Or explicitly install certain libraries if not in requirements.txt
+          # pip install streamlit spacy nltk sentence-transformers
 
-      - name: Run setup script
-        run: ./setup.sh
-        # Or: ./scripts/setup.sh if it's in the scripts/ folder
+      # 4. Download spaCy model & NLTK data so tests won't fail
+      - name: Download spaCy & NLTK data
+        run: |
+          python -m spacy download en_core_web_sm
+          python -c "import nltk; 
+          nltk.download('punkt_tab', quiet=True);
+          nltk.download('punkt', quiet=True);
+          nltk.download('wordnet', quiet=True);
+          nltk.download('averaged_perceptron_tagger', quiet=True)"
+
+      # 5. Lint
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. 
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      
+      # 6. Test (pytest)
+      - name: Run tests
+        run: |
+          pip install pytest
+          pytest
