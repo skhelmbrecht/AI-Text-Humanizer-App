@@ -32,7 +32,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
           # Or explicitly install certain libraries if not in requirements.txt
-          # pip install streamlit spacy nltk sentence-transformers
+          pip install streamlit spacy nltk sentence-transformers
 
       # 4. Download spaCy model & NLTK data so tests won't fail
       - name: Download spaCy & NLTK data
@@ -53,4 +53,3 @@ jobs:
           # exit-zero treats all errors as warnings. 
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
-

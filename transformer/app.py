@@ -1,4 +1,3 @@
-import streamlit as st
 import ssl
 import random
 import warnings
@@ -24,7 +23,7 @@ def download_nltk_resources():
     else:
         ssl._create_default_https_context = _create_unverified_https_context
 
-    resources = ['punkt', 'averaged_perceptron_tagger', 'punkt_tab','wordnet']
+    resources = ['punkt', 'averaged_perceptron_tagger', 'punkt_tab','wordnet','averaged_perceptron_tagger_eng']
     for resource in resources:
         try:
             nltk.download(resource, quiet=True)
