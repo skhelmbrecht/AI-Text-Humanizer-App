@@ -14,12 +14,14 @@ Transform AI-generated text into **formal, human-like, and academic writing** wi
 ✅ **Synonym Replacement** *(Optional)*: Replaces words with **more sophisticated alternatives**.  
 ✅ **Word & Sentence Statistics**: Instantly view **word and sentence counts** before and after transformation.  
 ✅ **Streamlit Web Interface**: Use a simple **web app** to input, transform, and copy text effortlessly.  
-✅ **PyQt Desktop Version** *(Coming Soon!)*: A standalone GUI for offline use.  
+ 
 
 ---
 
 ## 🚀 Live   
 🔗 **[Try the AI Text Humanizer App on Streamlit](https://ai-text-humanizer-app-by-dada.streamlit.app/)** *
+
+![AI-Text-Humanizer-App](media/AITOHUMAN.png)
 
 ---
 
@@ -61,10 +63,6 @@ streamlit run main.py
 - This will **open a browser** at `http://localhost:8501` 🎉  
 - Paste or upload your text, apply transformations, and see instant results!  
 
-### 🖥️ **Run the PyQt GUI (If Available)**  
-```bash
-python main.py    #Still in progress for PyQt
-```
 
 ---
 
@@ -113,6 +111,16 @@ AI-Text-Humanizer-App/
 ## 📄 License  
 
 📝 This project is licensed under the **MIT License** – feel free to use and modify it as needed.
+
+---
+## ⭐️ Support & Call-to-Action
+
+If you find this project useful, please consider:
+- **Starring** the repository ⭐️
+- **Forking** the project to contribute enhancements
+- **Following** for updates on future improvements
+
+Your engagement helps increase visibility and encourages further collaboration!
 
 ---
 
