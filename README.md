@@ -113,6 +113,16 @@ AI-Text-Humanizer-App/
 📝 This project is licensed under the **MIT License** – feel free to use and modify it as needed.
 
 ---
+## ⭐️ Support & Call-to-Action
+
+If you find this project useful, please consider:
+- **Starring** the repository ⭐️
+- **Forking** the project to contribute enhancements
+- **Following** for updates on future improvements
+
+Your engagement helps increase visibility and encourages further collaboration!
+
+---
 
 ## 📞 Contact & Support  
 
