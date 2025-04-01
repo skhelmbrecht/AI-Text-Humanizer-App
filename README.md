@@ -88,7 +88,7 @@ AI-Text-Humanizer-App/
 │   ├── __init__.py
 │   └── app.py                 # AI Text Humanization Engine
 ├── .github/workflows/         # GitHub CI/CD Config
-│   ├── ci.yml              # CI/CD for GitHub Actions
+│   ├── ci.yml               # CI/CD for GitHub Actions
 │   
 └── README.md 
                  # You are here! 🚀
