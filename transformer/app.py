@@ -68,57 +68,94 @@ class AcademicTextHumanizer:
         ]
 
     def humanize_text(self, text, use_passive=False, use_synonyms=False):
-        doc = self.nlp(text)
-        transformed_sentences = []
-
-        for sent in doc.sents:
-            sentence_str = sent.text.strip()
-
-            # 1. Expand contractions
-            sentence_str = self.expand_contractions(sentence_str)
-
-            # 2. Possibly add academic transitions
-            if random.random() < self.p_academic_transition:
-                sentence_str = self.add_academic_transitions(sentence_str)
-
-            # 3. Optionally convert to passive
-            if use_passive and random.random() < self.p_passive:
-                sentence_str = self.convert_to_passive(sentence_str)
-
-            # 4. Optionally replace words with synonyms
-            if use_synonyms and random.random() < self.p_synonym_replacement:
-                sentence_str = self.replace_with_synonyms(sentence_str)
-
-            transformed_sentences.append(sentence_str)
-
-        return ' '.join(transformed_sentences)
+        # Split text into paragraphs to preserve structure
+        paragraphs = self._split_into_paragraphs(text)
+        transformed_paragraphs = []
+        
+        for paragraph in paragraphs:
+            if not paragraph.strip():
+                continue
+                
+            doc = self.nlp(paragraph)
+            transformed_sentences = []
+            
+            for i, sent in enumerate(doc.sents):
+                sentence_str = sent.text.strip()
+                
+                # 1. Expand contractions
+                sentence_str = self.expand_contractions(sentence_str)
+                
+                # 2. Possibly add academic transitions (but not to first sentence of paragraph)
+                if i > 0 and random.random() < self.p_academic_transition:
+                    sentence_str = self.add_academic_transitions(sentence_str)
+                
+                # 3. Optionally convert to passive
+                if use_passive and random.random() < self.p_passive:
+                    sentence_str = self.convert_to_passive(sentence_str)
+                
+                # 4. Optionally replace words with synonyms
+                if use_synonyms and random.random() < self.p_synonym_replacement:
+                    sentence_str = self.replace_with_synonyms(sentence_str)
+                
+                transformed_sentences.append(sentence_str)
+            
+            # Join sentences in paragraph with proper spacing
+            if transformed_sentences:
+                paragraph_text = ' '.join(transformed_sentences)
+                # Clean up spacing issues
+                paragraph_text = self._clean_spacing(paragraph_text)
+                transformed_paragraphs.append(paragraph_text)
+        
+        # Join paragraphs with double newlines to preserve structure
+        return '\n\n'.join(transformed_paragraphs)
 
     def expand_contractions(self, sentence):
+        """Expand contractions while preserving original spacing and punctuation."""
+        import re
+        
         contraction_map = {
-            "n't": " not", "'re": " are", "'s": " is", "'ll": " will",
-            "'ve": " have", "'d": " would", "'m": " am"
+            r"\bn't\b": " not",
+            r"\b're\b": " are", 
+            r"\b's\b": " is",
+            r"\b'll\b": " will",
+            r"\b've\b": " have",
+            r"\b'd\b": " would",
+            r"\b'm\b": " am"
         }
-        tokens = word_tokenize(sentence)
-        expanded_tokens = []
-        for token in tokens:
-            lower_token = token.lower()
-            replaced = False
-            for contraction, expansion in contraction_map.items():
-                if contraction in lower_token and lower_token.endswith(contraction):
-                    new_token = lower_token.replace(contraction, expansion)
-                    if token[0].isupper():
-                        new_token = new_token.capitalize()
-                    expanded_tokens.append(new_token)
-                    replaced = True
-                    break
-            if not replaced:
-                expanded_tokens.append(token)
-
-        return ' '.join(expanded_tokens)
+        
+        result = sentence
+        for contraction_pattern, expansion in contraction_map.items():
+            # Use regex substitution to preserve spacing and capitalization
+            result = re.sub(contraction_pattern, expansion, result, flags=re.IGNORECASE)
+        
+        return result
 
     def add_academic_transitions(self, sentence):
         transition = random.choice(self.academic_transitions)
+        # Make the first word of the original sentence lowercase unless it's a proper noun
+        words = sentence.split()
+        if words and not self._is_proper_noun(words[0], sentence):
+            words[0] = words[0].lower()
+            sentence = ' '.join(words)
         return f"{transition} {sentence}"
+    
+    def _is_proper_noun(self, word, context_sentence):
+        """Check if a word is a proper noun using spaCy NER."""
+        # Use spaCy to analyze the sentence and check if the first word is a named entity
+        doc = self.nlp(context_sentence)
+        if doc and len(doc) > 0:
+            first_token = doc[0]
+            # Check if it's a named entity or has proper noun POS tag
+            if first_token.ent_type_ or first_token.pos_ == 'PROPN':
+                return True
+        
+        # Additional check for common proper nouns that might be missed
+        proper_indicators = {'Mr', 'Mrs', 'Ms', 'Dr', 'Prof', 'President', 'January', 'February', 'March', 
+                           'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 
+                           'December', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 
+                           'Sunday', 'America', 'Europe', 'Asia', 'Africa', 'Australia', 'Antarctica'}
+        
+        return word in proper_indicators
 
     def convert_to_passive(self, sentence):
         doc = self.nlp(sentence)
@@ -157,6 +194,48 @@ class AcademicTextHumanizer:
                 new_tokens.append(word)
 
         return ' '.join(new_tokens)
+
+    def _split_into_paragraphs(self, text):
+        """Split text into paragraphs, preserving paragraph structure."""
+        import re
+        # Split on double newlines or more, preserving the paragraph breaks
+        paragraphs = re.split(r'\n\s*\n', text.strip())
+        return [p.strip() for p in paragraphs if p.strip()]
+
+    def _clean_spacing(self, text):
+        """Clean up unnecessary spaces while preserving proper formatting."""
+        import re
+        
+        # First, normalize all whitespace to single spaces
+        text = re.sub(r'\s+', ' ', text)
+        
+        # Fix spacing around punctuation marks
+        text = re.sub(r'\s+([.!?,:;])', r'\1', text)
+        text = re.sub(r'([.!?])\s*([A-Z])', r'\1 \2', text)
+        
+        # Comprehensive quotation mark handling
+        # Pattern 1: Fix spaces inside quotes - remove space after opening quote
+        text = re.sub(r'(["\'])\s+', r'\1', text)
+        # Pattern 2: Fix spaces inside quotes - remove space before closing quote
+        text = re.sub(r'\s+(["\'])', r'\1', text)
+        # Pattern 3: Ensure space before opening quote (when preceded by word)
+        text = re.sub(r'([a-zA-Z])(["\'])', r'\1 \2', text)
+        # Pattern 4: Ensure space after closing quote (when followed by word)
+        text = re.sub(r'(["\'])([a-zA-Z])', r'\1 \2', text)
+        # Pattern 5: Handle punctuation after quotes
+        text = re.sub(r'(["\'])\s*([.!?,:;])', r'\1\2', text)
+        
+        # Fix spacing around parentheses and brackets
+        text = re.sub(r'\s+([)\]])', r'\1', text)  # Remove space before closing
+        text = re.sub(r'([\(\[])\s+', r'\1', text)  # Remove space after opening
+        
+        # Clean up any remaining multiple spaces
+        text = re.sub(r'\s+', ' ', text)
+        
+        # Remove leading/trailing whitespace
+        text = text.strip()
+        
+        return text
 
     def _get_synonyms(self, word, pos):
         wn_pos = None
